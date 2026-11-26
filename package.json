@@ -1,0 +1,10 @@
+{
+  "name": "3d-studio-hub",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "setup": "npm --prefix hub install && npm --prefix projects/sword-divine install && npm --prefix projects/aug-a1 install && npm --prefix projects/violino-3d install",
+    "dev": "npm --prefix hub run dev",
+    "add-project": "npm --prefix hub run add-project --"
+  }
+}

@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-void: #080318;
+  --accent-magenta: #FF0055;
+  --accent-cyan: #00F5D4;
+  --accent-amber: #FF7B00;
+  --accent-violet: #7B2CBF;
+}
+
+html {
+  background-color: var(--bg-void);
+  color: #ffffff;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-void);
+  font-family: var(--font-jakarta), sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom sleek cyber scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080318;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1f1147;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 245, 212, 0.2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00F5D4;
+}
+
+/* Hide default cursor on interactive canvas when custom cursor is active */
+canvas {
+  cursor: none;
+}
+
+/* Restore pointer/grab cursor on isolated embed stage (uses OrbitControls) */
+.violin-embed-stage canvas {
+  cursor: grab;
+}
+
+.violin-embed-stage canvas:active {
+  cursor: grabbing;
+}
+
+.violin-embed-stage.is-over-string canvas {
+  cursor: pointer;
+}

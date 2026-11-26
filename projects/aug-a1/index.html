@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Steyr AUG A1 • Reconstrução 3D Procedural PBR &amp; Interativa</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #eef1f4;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b;
+    }
+    #canvas-container {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+    }
+    #canvas-container canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+    #ui-header {
+      position: fixed;
+      top: 16px;
+      left: 20px;
+      z-index: 100;
+      pointer-events: none;
+    }
+    #ui-header h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      color: #0f172a;
+    }
+    #ui-header p {
+      font-size: 12px;
+      color: #475569;
+      margin-top: 2px;
+    }
+
+    /* Floating Part Inspector Card */
+    #part-inspector {
+      position: fixed;
+      top: 72px;
+      left: 20px;
+      width: 300px;
+      z-index: 110;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(15, 23, 42, 0.14);
+      border-radius: 14px;
+      padding: 14px 16px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
+      display: none;
+    }
+    #part-inspector.visible {
+      display: block;
+    }
+    .inspector-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .inspector-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #4b5336;
+      color: #ffffff;
+    }
+    #inspector-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+    .inspector-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 4px 10px;
+      font-size: 11.5px;
+      margin-bottom: 10px;
+    }
+    .inspector-label {
+      color: #64748b;
+      font-weight: 600;
+    }
+    .inspector-val {
+      color: #1e293b;
+      font-weight: 500;
+      word-break: break-word;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11px;
+    }
+    .inspector-val.sans {
+      font-family: inherit;
+      font-size: 11.5px;
+    }
+    #clear-selection-btn {
+      width: 100%;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    #clear-selection-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    /* Compact Mechanical Actions Panel */
+    #actions-panel {
+      position: fixed;
+      bottom: 72px;
+      left: 20px;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(10px);
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+      width: 210px;
+    }
+    .panel-caption {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #64748b;
+      padding: 0 4px 2px;
+    }
+    .action-btn {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #1e293b;
+      padding: 6px 10px;
+      border-radius: 9px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .action-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+    .action-btn.active {
+      background: #4b5336;
+      border-color: #4b5336;
+      color: #ffffff;
+    }
+    .action-btn.export {
+      background: #0f172a;
+      border-color: #0f172a;
+      color: #ffffff;
+      margin-top: 2px;
+      justify-content: center;
+    }
+    .action-btn.export:hover {
+      background: #1e293b;
+    }
+
+    /* Bottom Camera Bar */
+    #camera-controls {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(10px);
+      padding: 7px 10px;
+      border-radius: 28px;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+      max-width: calc(100vw - 220px);
+      overflow-x: auto;
+    }
+    .view-btn, #closeup-select {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      padding: 6px 11px;
+      border-radius: 18px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .view-btn:hover, #closeup-select:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+    .view-btn.active, #closeup-select.active {
+      background: #4b5336;
+      border-color: #4b5336;
+      color: #ffffff;
+    }
+    #ref-toggle {
+      position: fixed;
+      bottom: 18px;
+      right: 20px;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(15, 23, 42, 0.15);
+      color: #1e293b;
+      padding: 7px 14px;
+      border-radius: 18px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+    }
+    #ref-overlay {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 50;
+      transition: opacity 0.2s ease;
+    }
+    #error-banner {
+      display: none;
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 9999;
+      background: #b91c1c;
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+
+  <div id="ui-header">
+    <h1>STEYR AUG A1</h1>
+    <p>Steyr AUG A1 • Reconstrução 3D Procedural PBR &amp; Interativa</p>
+  </div>
+
+  <aside id="part-inspector" aria-live="polite">
+    <div class="inspector-top">
+      <span class="inspector-badge" id="inspector-level">MACRO</span>
+      <span style="font-size:11px;color:#64748b;">Peça Selecionada</span>
+    </div>
+    <div id="inspector-title">Coronha Monobloco Polímero Bullpup</div>
+    <div class="inspector-grid">
+      <span class="inspector-label">ID Técnico:</span>
+      <span class="inspector-val" id="inspector-id">polymer_stock_chassis</span>
+      <span class="inspector-label">Material PBR:</span>
+      <span class="inspector-val sans" id="inspector-material">Polímero OD Fosco</span>
+      <span class="inspector-label">Grupo:</span>
+      <span class="inspector-val" id="inspector-group">chassis_group</span>
+      <span class="inspector-label">Triângulos:</span>
+      <span class="inspector-val" id="inspector-tris">44.616</span>
+    </div>
+    <button id="clear-selection-btn" type="button">Limpar seleção</button>
+  </aside>
+
+  <div id="actions-panel">
+    <div class="panel-caption">Ações Mecânicas</div>
+    <button class="action-btn" id="btn-foregrip" type="button">
+      <span>Dobrar Foregrip</span><span id="state-foregrip">Aberto</span>
+    </button>
+    <button class="action-btn" id="btn-mag" type="button">
+      <span>Ejetar Carregador</span><span id="state-mag">Inserido</span>
+    </button>
+    <button class="action-btn" id="btn-charging" type="button">
+      <span>Alavanca de Manejo</span><span id="state-charging">Fechada</span>
+    </button>
+    <button class="action-btn" id="btn-trigger" type="button">
+      <span>Acionar Gatilho</span><span id="state-trigger">Repouso</span>
+    </button>
+    <button class="action-btn" id="btn-safety" type="button">
+      <span>Trava de Segurança</span><span id="state-safety">Fogo</span>
+    </button>
+    <button class="action-btn export" id="btn-export-glb" type="button">Exportar .GLB</button>
+  </div>
+
+  <div id="camera-controls">
+    <button class="view-btn active" data-view="three_quarter_front">3/4 Frente</button>
+    <button class="view-btn" data-view="three_quarter_rear">3/4 Traseira</button>
+    <button class="view-btn" data-view="right">Direita (+Z)</button>
+    <button class="view-btn" data-view="left">Esquerda (-Z)</button>
+    <button class="view-btn" data-view="top">Topo (+Y)</button>
+    <button class="view-btn" data-view="front_muzzle">Boca (+X)</button>
+    <button class="view-btn" data-view="rear_butt">Soleira (-X)</button>
+    <select id="closeup-select" aria-label="Close-ups de inspeção">
+      <option value="">Close-ups...</option>
+      <option value="closeup_optic">Luneta Swarovski</option>
+      <option value="closeup_mag_trigger">Carregador / Gatilho</option>
+      <option value="closeup_muzzle">Quebra-Chamas Tulipa</option>
+      <option value="closeup_ejection_buttpad">Ejeção / Soleira</option>
+      <option value="closeup_material_grazing">Luz Rasante PBR</option>
+    </select>
+  </div>
+
+  <button id="ref-toggle" type="button">Overlay Ref. Direita</button>
+  <img id="ref-overlay" src="/aug_right_side.png" alt="Referência Direita Steyr AUG A1" />
+
+  <div id="error-banner"></div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

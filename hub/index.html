@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Studio Hub — Galeria Unificada</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div class="hub-shell">
+      <header class="hub-header">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">3D</span>
+          <div class="brand-text">
+            <h1 class="brand-title">Studio Hub</h1>
+            <p class="brand-subtitle" id="active-description">Carregando projetos...</p>
+          </div>
+        </div>
+
+        <div class="tablist-wrap">
+          <div
+            id="project-tablist"
+            class="tablist"
+            focusgroup="tablist nomemory"
+            aria-label="Modelos 3D disponíveis"
+          ></div>
+        </div>
+
+        <div class="hub-actions">
+          <button
+            id="reload-btn"
+            class="action-btn"
+            type="button"
+            title="Recarregar visualizador atual"
+          >
+            Recarregar
+          </button>
+          <a
+            id="open-external-link"
+            class="action-btn action-link"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Abrir projeto isolado em nova aba"
+          >
+            Abrir ↗
+          </a>
+        </div>
+      </header>
+
+      <main class="viewer-main">
+        <div
+          id="viewer-panel"
+          class="viewer-panel"
+          role="tabpanel"
+          aria-labelledby=""
+        >
+          <div id="viewer-loading" class="viewer-overlay" hidden>
+            <div class="spinner" aria-hidden="true"></div>
+            <p id="loading-label">Carregando modelo 3D...</p>
+          </div>
+
+          <iframe
+            id="viewer-iframe"
+            class="viewer-iframe"
+            title="Visualizador 3D"
+            allow="autoplay; fullscreen"
+          ></iframe>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

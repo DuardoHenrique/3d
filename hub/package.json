@@ -1,0 +1,20 @@
+{
+  "name": "3d-projects-hub",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/start-hub.mjs",
+    "dev:ui-only": "vite --port 4000 --strictPort",
+    "build": "tsc && vite build",
+    "preview": "vite preview --port 4000 --strictPort",
+    "add-project": "node scripts/add-project.mjs"
+  },
+  "dependencies": {
+    "@microsoft/focusgroup-polyfill": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "vite": "^5.4.2"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "hubPort": 4000,
+  "projects": [
+    {
+      "id": "sword-divine",
+      "name": "Sword Divine",
+      "badge": "Three.js",
+      "description": "Espada Divina procedural em cristal e ouro PBR",
+      "accent": "#FBD472",
+      "url": "http://localhost:5173",
+      "enabled": true,
+      "dev": {
+        "cwd": "../projects/sword-divine",
+        "command": "npm run dev -- --port 5173 --strictPort",
+        "port": 5173
+      }
+    },
+    {
+      "id": "aug-a1",
+      "name": "Steyr AUG A1",
+      "badge": "Three.js",
+      "description": "Rifle bullpup PBR com inspeção de peças e ações mecânicas",
+      "accent": "#94A86B",
+      "url": "http://localhost:5175",
+      "enabled": true,
+      "dev": {
+        "cwd": "../projects/aug-a1",
+        "command": "npm run dev -- --port 5175 --strictPort",
+        "port": 5175
+      }
+    },
+    {
+      "id": "violino-3d",
+      "name": "Violino 3D",
+      "badge": "R3F + Tone.js",
+      "description": "Violino interativo isolado com cordas sonoras e partículas",
+      "accent": "#00F5D4",
+      "url": "http://localhost:3000/embed",
+      "enabled": true,
+      "dev": {
+        "cwd": "../projects/violino-3d",
+        "command": "npm run dev -- -p 3000",
+        "port": 3000
+      }
+    }
+  ]
+}
