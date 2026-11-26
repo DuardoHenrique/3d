@@ -110,8 +110,20 @@ const CameraPresetRig: React.FC<CameraPresetRigProps> = ({
 
   useEffect(() => {
     const config = VIOLIN_CAMERA_PRESETS[preset];
-    desiredPos.current.set(...config.position);
-    desiredTarget.current.set(...config.target);
+    const aspect =
+      typeof window !== "undefined"
+        ? window.innerWidth / Math.max(1, window.innerHeight)
+        : 1;
+    const distScale = aspect < 0.85 ? 1.18 : 1.0;
+    const tx = config.target[0];
+    const ty = config.target[1];
+    const tz = config.target[2];
+    desiredPos.current.set(
+      tx + (config.position[0] - tx) * distScale,
+      ty + (config.position[1] - ty) * distScale,
+      tz + (config.position[2] - tz) * distScale
+    );
+    desiredTarget.current.set(tx, ty, tz);
     isAnimating.current = true;
   }, [preset, resetToken]);
 
@@ -154,6 +166,7 @@ interface ViolinEmbedSceneProps {
   externalPulse?: { stringId: string; nonce: number } | null;
   onHoverString?: (stringId: string | null, color: string | null) => void;
   setIsOverString?: (over: boolean) => void;
+  onSoftwareMode?: () => void;
 }
 
 export const ViolinEmbedScene: React.FC<ViolinEmbedSceneProps> = ({
@@ -163,6 +176,7 @@ export const ViolinEmbedScene: React.FC<ViolinEmbedSceneProps> = ({
   externalPulse = null,
   onHoverString,
   setIsOverString,
+  onSoftwareMode,
 }) => {
   const [bursts, setBursts] = useState<ParticleBurst[]>([]);
   const [webgl, setWebgl] = useState<WebGLProbe>({
@@ -198,6 +212,7 @@ export const ViolinEmbedScene: React.FC<ViolinEmbedSceneProps> = ({
       externalPulse={externalPulse}
       onHoverString={onHoverString}
       setIsOverString={setIsOverString}
+      onSoftwareMode={onSoftwareMode}
     />
   );
 

@@ -258,6 +258,9 @@
       z-index: 50;
       transition: opacity 0.2s ease;
     }
+    #actions-toggle {
+      display: none;
+    }
     #error-banner {
       display: none;
       position: fixed;
@@ -269,6 +272,92 @@
       padding: 10px 16px;
       border-radius: 8px;
       font-size: 13px;
+    }
+
+    @media (max-width: 768px) {
+      #ui-header {
+        top: 10px;
+        left: 12px;
+        max-width: calc(100vw - 140px);
+      }
+      #ui-header h1 {
+        font-size: 14px;
+        letter-spacing: 0.4px;
+      }
+      #ui-header p {
+        font-size: 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .lil-gui {
+        max-width: 170px !important;
+        font-size: 10.5px !important;
+      }
+      #actions-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        position: fixed;
+        bottom: 58px;
+        left: 10px;
+        z-index: 105;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(15, 23, 42, 0.16);
+        color: #0f172a;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+      }
+      #actions-panel {
+        bottom: 94px;
+        left: 10px;
+        width: min(210px, calc(100vw - 20px));
+        padding: 8px;
+        display: none;
+      }
+      #actions-panel.open {
+        display: flex;
+      }
+      #part-inspector {
+        top: auto;
+        bottom: 94px;
+        left: 10px;
+        right: 10px;
+        width: auto;
+        max-width: calc(100vw - 20px);
+        padding: 10px 12px;
+      }
+      #camera-controls {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        transform: none;
+        width: calc(100vw - 20px);
+        max-width: none;
+        justify-content: flex-start;
+        padding: 5px 8px;
+        scrollbar-width: none;
+      }
+      #camera-controls::-webkit-scrollbar {
+        display: none;
+      }
+      .view-btn, #closeup-select {
+        padding: 5px 10px;
+        font-size: 11px;
+        flex-shrink: 0;
+      }
+      #ref-toggle {
+        top: 52px;
+        left: 12px;
+        bottom: auto;
+        right: auto;
+        padding: 4px 10px;
+        font-size: 10.5px;
+      }
     }
   </style>
 </head>
@@ -298,6 +387,8 @@
     </div>
     <button id="clear-selection-btn" type="button">Limpar seleção</button>
   </aside>
+
+  <button id="actions-toggle" type="button" aria-expanded="false">Ações ▾</button>
 
   <div id="actions-panel">
     <div class="panel-caption">Ações Mecânicas</div>

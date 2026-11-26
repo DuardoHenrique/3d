@@ -120,7 +120,9 @@ try {
     pointer-events: none;
     box-shadow: 0 4px 15px rgba(0,0,0,0.45);
     transition: opacity 0.4s ease;
-    white-space: nowrap;
+    max-width: calc(100vw - 24px);
+    text-align: center;
+    white-space: ${isMobile ? 'normal' : 'nowrap'};
   `;
   document.body.appendChild(hintPill);
 

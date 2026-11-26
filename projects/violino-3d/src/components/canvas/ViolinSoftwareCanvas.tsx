@@ -262,6 +262,7 @@ interface ViolinSoftwareCanvasProps {
   externalPulse?: { stringId: string; nonce: number } | null;
   onHoverString?: (stringId: string | null, color: string | null) => void;
   setIsOverString?: (over: boolean) => void;
+  onSoftwareMode?: () => void;
 }
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "";
@@ -274,6 +275,7 @@ export const ViolinSoftwareCanvas: React.FC<ViolinSoftwareCanvasProps> = ({
   externalPulse = null,
   onHoverString,
   setIsOverString,
+  onSoftwareMode,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -309,9 +311,26 @@ export const ViolinSoftwareCanvas: React.FC<ViolinSoftwareCanvasProps> = ({
   });
 
   useEffect(() => {
+    onSoftwareMode?.();
+  }, [onSoftwareMode]);
+
+  useEffect(() => {
     const cfg = VIOLIN_CAMERA_PRESETS[preset];
-    presetTargetRef.current.pos.set(...cfg.position);
-    presetTargetRef.current.target.set(...cfg.target);
+    const aspect =
+      typeof window !== "undefined"
+        ? (containerRef.current?.clientWidth || window.innerWidth) /
+          Math.max(1, containerRef.current?.clientHeight || window.innerHeight)
+        : 1;
+    const distScale = aspect < 0.85 ? 1.18 : 1.0;
+    const tx = cfg.target[0];
+    const ty = cfg.target[1];
+    const tz = cfg.target[2];
+    presetTargetRef.current.pos.set(
+      tx + (cfg.position[0] - tx) * distScale,
+      ty + (cfg.position[1] - ty) * distScale,
+      tz + (cfg.position[2] - tz) * distScale
+    );
+    presetTargetRef.current.target.set(tx, ty, tz);
     presetTargetRef.current.animating = true;
   }, [preset, resetToken]);
 
@@ -574,9 +593,6 @@ export const ViolinSoftwareCanvas: React.FC<ViolinSoftwareCanvasProps> = ({
   return (
     <div className="relative w-full h-full">
       <div ref={containerRef} className="w-full h-full" />
-      <div className="pointer-events-none absolute top-20 left-4 z-20 rounded-full bg-void/80 border border-amber-400/35 px-3 py-1 text-[10px] font-mono text-amber-200/90">
-        Modo Software 3D (WebGL indisponível neste navegador)
-      </div>
       {loadError && (
         <div className="absolute inset-0 flex items-center justify-center bg-void/90 text-sm text-red-300 font-mono">
           {loadError}

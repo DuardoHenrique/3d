@@ -827,9 +827,22 @@ try {
       .add(guiParams, 'yawEsquerda', -12, 12, 0.5)
       .name('Yaw Vista Esq (°)')
       .onChange((v: number) => setView('left', { yawDeg: v }));
+
+    if (window.innerWidth <= 768) {
+      gui.close();
+    }
   } catch (guiErr) {
     console.warn('lil-gui warning:', guiErr);
   }
+
+  const actionsToggleBtn = document.getElementById('actions-toggle');
+  const actionsPanelEl = document.getElementById('actions-panel');
+  actionsToggleBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = actionsPanelEl?.classList.toggle('open') ?? false;
+    actionsToggleBtn.setAttribute('aria-expanded', String(isOpen));
+    actionsToggleBtn.textContent = isOpen ? 'Ações ▴' : 'Ações ▾';
+  });
 
   // Apply initial state & render deterministically
   syncActionButtonsAndGui();

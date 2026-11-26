@@ -101,9 +101,9 @@ function initializeAugRenderer(
   container.appendChild(softRenderer.domElement);
 
   const badge = document.createElement('div');
-  badge.textContent = 'Modo Software 3D (WebGL indisponível)';
+  badge.textContent = 'Software 3D (sem WebGL)';
   badge.style.cssText =
-    'position:fixed;bottom:58px;right:20px;z-index:110;padding:5px 11px;border-radius:999px;background:rgba(15,23,42,0.82);color:#fde68a;font-size:11px;font-weight:600;pointer-events:none;border:1px solid rgba(251,191,36,0.35);';
+    'position:fixed;bottom:58px;right:12px;z-index:105;padding:5px 10px;border-radius:999px;background:rgba(15,23,42,0.84);color:#fde68a;font-size:10.5px;font-weight:600;pointer-events:none;border:1px solid rgba(251,191,36,0.35);';
   document.body.appendChild(badge);
 
   return { renderer: softRenderer, isSoftwareRenderer: true };
@@ -224,6 +224,32 @@ export function setupAugScene(container: HTMLElement): AugSceneContext {
     perspCamera.updateProjectionMatrix();
   }
 
+  function setPerspFramed(
+    pos: [number, number, number],
+    target: [number, number, number],
+    zoomScale = 1.24,
+  ) {
+    updatePerspAspect();
+    const aspect = Math.max(0.42, perspCamera.aspect || 1);
+    const portraitScale = aspect < 1 ? Math.min(2.25, 1.0 / aspect) : 1.0;
+    const totalScale = zoomScale * portraitScale;
+
+    const tx = target[0];
+    const ty = target[1];
+    const tz = target[2];
+
+    perspCamera.up.set(0, 1, 0);
+    perspCamera.position.set(
+      tx + (pos[0] - tx) * totalScale,
+      ty + (pos[1] - ty) * totalScale,
+      tz + (pos[2] - tz) * totalScale,
+    );
+    perspCamera.lookAt(tx, ty, tz);
+    activeCamera = perspCamera;
+    controls.object = perspCamera;
+    controls.target.set(tx, ty, tz);
+  }
+
   function setView(name: ViewName, opts: SetViewOptions = {}) {
     currentView = name;
     if (opts.yawDeg !== undefined) {
@@ -231,7 +257,7 @@ export function setupAugScene(container: HTMLElement): AugSceneContext {
     }
 
     if (name === 'right') {
-      updateOrthoBounds(0.8774, 0.3838);
+      updateOrthoBounds(1.06, 0.46);
       orthoCamera.up.set(0, 1, 0);
       orthoCamera.position.set(0, -0.0523, 2.0);
       orthoCamera.lookAt(0, -0.0523, 0);
@@ -240,7 +266,7 @@ export function setupAugScene(container: HTMLElement): AugSceneContext {
       controls.object = orthoCamera;
       controls.target.set(0, -0.0523, 0);
     } else if (name === 'left') {
-      updateOrthoBounds(0.8774, 0.3838);
+      updateOrthoBounds(1.06, 0.46);
       const yawRad = THREE.MathUtils.degToRad(opts.yawDeg ?? currentLeftYawDeg);
       const dist = 2.0;
       orthoCamera.up.set(0, 1, 0);
@@ -255,7 +281,7 @@ export function setupAugScene(container: HTMLElement): AugSceneContext {
       controls.object = orthoCamera;
       controls.target.set(0, -0.0463, 0);
     } else if (name === 'top') {
-      updateOrthoBounds(0.88, 0.30);
+      updateOrthoBounds(1.06, 0.36);
       orthoCamera.up.set(0, 0, -1);
       orthoCamera.position.set(0, 2.0, 0);
       orthoCamera.lookAt(0, 0, 0);
@@ -264,78 +290,25 @@ export function setupAugScene(container: HTMLElement): AugSceneContext {
       controls.object = orthoCamera;
       controls.target.set(0, 0, 0);
     } else if (name === 'front_muzzle') {
-      updatePerspAspect();
-      perspCamera.up.set(0, 1, 0);
-      perspCamera.position.set(0.66, -0.04, 0.08);
-      perspCamera.lookAt(0.08, -0.04, 0);
-      activeCamera = perspCamera;
-      controls.object = perspCamera;
-      controls.target.set(0.08, -0.04, 0);
+      setPerspFramed([0.66, -0.04, 0.08], [0.08, -0.04, 0], 1.24);
     } else if (name === 'rear_butt') {
-      updatePerspAspect();
-      perspCamera.up.set(0, 1, 0);
-      perspCamera.position.set(-0.66, -0.04, -0.08);
-      perspCamera.lookAt(-0.12, -0.04, 0);
-      activeCamera = perspCamera;
-      controls.object = perspCamera;
-      controls.target.set(-0.12, -0.04, 0);
+      setPerspFramed([-0.66, -0.04, -0.08], [-0.12, -0.04, 0], 1.24);
     } else if (name === 'three_quarter_front') {
-      updatePerspAspect();
-      perspCamera.up.set(0, 1, 0);
-      perspCamera.position.set(0.68, 0.24, 0.88);
-      perspCamera.lookAt(0, -0.05, 0);
-      activeCamera = perspCamera;
-      controls.object = perspCamera;
-      controls.target.set(0, -0.05, 0);
+      setPerspFramed([0.68, 0.24, 0.88], [0, -0.05, 0], 1.24);
     } else if (name === 'three_quarter_rear') {
-      updatePerspAspect();
-      perspCamera.up.set(0, 1, 0);
-      perspCamera.position.set(-0.72, 0.24, -0.86);
-      perspCamera.lookAt(0, -0.05, 0);
-      activeCamera = perspCamera;
-      controls.object = perspCamera;
-      controls.target.set(0, -0.05, 0);
+      setPerspFramed([-0.72, 0.24, -0.86], [0, -0.05, 0], 1.24);
     } else if (name === 'closeup_optic') {
-      updatePerspAspect();
-      perspCamera.up.set(0, 1, 0);
-      perspCamera.position.set(0.22, 0.11, -0.28);
-      perspCamera.lookAt(0.02, 0.032, 0);
-      activeCamera = perspCamera;
-      controls.object = perspCamera;
-      controls.target.set(0.02, 0.032, 0);
+      setPerspFramed([0.22, 0.11, -0.28], [0.02, 0.032, 0], 1.1);
     } else if (name === 'closeup_mag_trigger') {
-      updatePerspAspect();
-      perspCamera.up.set(0, 1, 0);
-      perspCamera.position.set(-0.20, -0.03, -0.39);
-      perspCamera.lookAt(-0.10, -0.090, 0);
-      activeCamera = perspCamera;
-      controls.object = perspCamera;
-      controls.target.set(-0.10, -0.090, 0);
+      setPerspFramed([-0.20, -0.03, -0.39], [-0.10, -0.090, 0], 1.1);
     } else if (name === 'closeup_muzzle') {
-      updatePerspAspect();
-      perspCamera.up.set(0, 1, 0);
-      perspCamera.position.set(0.46, 0.08, 0.24);
-      perspCamera.lookAt(0.265, -0.005, 0);
-      activeCamera = perspCamera;
-      controls.object = perspCamera;
-      controls.target.set(0.265, -0.005, 0);
+      setPerspFramed([0.46, 0.08, 0.24], [0.265, -0.005, 0], 1.1);
     } else if (name === 'closeup_ejection_buttpad') {
-      updatePerspAspect();
-      perspCamera.up.set(0, 1, 0);
-      perspCamera.position.set(-0.12, 0.015, 0.37);
-      perspCamera.lookAt(-0.258, -0.055, 0.012);
-      activeCamera = perspCamera;
-      controls.object = perspCamera;
-      controls.target.set(-0.258, -0.055, 0.012);
+      setPerspFramed([-0.12, 0.015, 0.37], [-0.258, -0.055, 0.012], 1.1);
     } else if (name === 'closeup_material_grazing') {
-      updatePerspAspect();
-      perspCamera.up.set(0, 1, 0);
-      perspCamera.position.set(0.21, 0.095, 0.34);
-      perspCamera.lookAt(-0.04, 0.005, 0.0);
-      activeCamera = perspCamera;
-      controls.object = perspCamera;
-      controls.target.set(-0.04, 0.005, 0.0);
+      setPerspFramed([0.21, 0.095, 0.34], [-0.04, 0.005, 0.0], 1.1);
     }
+    controls.update();
     renderOnce();
   }
 
