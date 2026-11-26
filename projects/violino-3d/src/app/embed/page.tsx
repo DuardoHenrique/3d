@@ -16,7 +16,7 @@ import { AudioController } from "@/components/ui/AudioController";
 import {
   VIOLIN_CAMERA_PRESETS,
   ViolinCameraPreset,
-} from "@/components/canvas/ViolinEmbedScene";
+} from "@/components/canvas/violinPresets";
 
 const ViolinEmbedScene = dynamic(
   () =>

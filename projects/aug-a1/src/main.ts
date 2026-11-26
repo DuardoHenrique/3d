@@ -841,6 +841,11 @@ try {
   (window as any).__READY__ = true;
 
   // Render loop only updates OrbitControls / smooth lerps once user interacts or triggers action
+  let controlsDirty = false;
+  ctx.controls.addEventListener('change', () => {
+    controlsDirty = true;
+  });
+
   let lastTime = performance.now();
   function animate(now = performance.now()) {
     requestAnimationFrame(animate);
@@ -896,8 +901,11 @@ try {
     }
 
     if ((window as any).__interactive) {
-      ctx.controls.update();
-      ctx.renderOnce();
+      const moved = ctx.controls.update();
+      if (!ctx.isSoftwareRenderer || moved || controlsDirty) {
+        controlsDirty = false;
+        ctx.renderOnce();
+      }
     }
   }
   animate();

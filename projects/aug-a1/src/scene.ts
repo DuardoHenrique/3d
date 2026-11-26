@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { SoftwareRenderer3D } from './SoftwareRenderer3D';
 
 export type ViewName =
   | 'right'
@@ -24,7 +25,8 @@ export type SetViewOptions = {
 
 export interface AugSceneContext {
   scene: THREE.Scene;
-  renderer: THREE.WebGLRenderer;
+  renderer: THREE.WebGLRenderer | SoftwareRenderer3D;
+  isSoftwareRenderer: boolean;
   orthoCamera: THREE.OrthographicCamera;
   perspCamera: THREE.PerspectiveCamera;
   getActiveCamera: () => THREE.Camera;
@@ -37,36 +39,95 @@ export interface AugSceneContext {
   markInteractive: () => void;
 }
 
+function initializeAugRenderer(
+  container: HTMLElement,
+  width: number,
+  height: number,
+): { renderer: THREE.WebGLRenderer | SoftwareRenderer3D; isSoftwareRenderer: boolean } {
+  const testCanvas = document.createElement('canvas');
+
+  const attempts: { type: string; attrs: WebGLContextAttributes; antialias: boolean }[] = [
+    {
+      type: 'webgl2',
+      attrs: { antialias: true, alpha: false, preserveDrawingBuffer: true, powerPreference: 'default' },
+      antialias: true,
+    },
+    {
+      type: 'webgl2',
+      attrs: { antialias: false, alpha: false, preserveDrawingBuffer: true, failIfMajorPerformanceCaveat: false, powerPreference: 'default' },
+      antialias: false,
+    },
+    {
+      type: 'webgl',
+      attrs: { antialias: false, alpha: false, preserveDrawingBuffer: true, failIfMajorPerformanceCaveat: false },
+      antialias: false,
+    },
+    {
+      type: 'experimental-webgl',
+      attrs: { antialias: false, alpha: false, failIfMajorPerformanceCaveat: false },
+      antialias: false,
+    },
+  ];
+
+  for (const attempt of attempts) {
+    try {
+      const glContext = testCanvas.getContext(attempt.type, attempt.attrs);
+      if (glContext) {
+        const renderer = new THREE.WebGLRenderer({
+          canvas: testCanvas,
+          context: glContext as any,
+          antialias: attempt.antialias,
+          alpha: false,
+          preserveDrawingBuffer: true,
+          powerPreference: 'default',
+        });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.02;
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+        return { renderer, isSoftwareRenderer: false };
+      }
+    } catch {
+      // try next attempt
+    }
+  }
+
+  const softRenderer = new SoftwareRenderer3D(width, height);
+  softRenderer.setPixelRatio(window.devicePixelRatio || 1);
+  container.appendChild(softRenderer.domElement);
+
+  const badge = document.createElement('div');
+  badge.textContent = 'Modo Software 3D (WebGL indisponível)';
+  badge.style.cssText =
+    'position:fixed;bottom:58px;right:20px;z-index:110;padding:5px 11px;border-radius:999px;background:rgba(15,23,42,0.82);color:#fde68a;font-size:11px;font-weight:600;pointer-events:none;border:1px solid rgba(251,191,36,0.35);';
+  document.body.appendChild(badge);
+
+  return { renderer: softRenderer, isSoftwareRenderer: true };
+}
+
 export function setupAugScene(container: HTMLElement): AugSceneContext {
   const width = container.clientWidth || window.innerWidth || 1024;
   const height = container.clientHeight || window.innerHeight || 448;
 
-  const renderer = new THREE.WebGLRenderer({
-    antialias: true,
-    alpha: false,
-    preserveDrawingBuffer: true,
-    powerPreference: 'default',
-  });
-  renderer.setSize(width, height);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.02;
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  container.appendChild(renderer.domElement);
+  const { renderer, isSoftwareRenderer } = initializeAugRenderer(container, width, height);
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color().setStyle('#eef1f4', THREE.SRGBColorSpace);
 
-  // Code-generated PMREM environment using RoomEnvironment
-  try {
-    const pmrem = new THREE.PMREMGenerator(renderer);
-    const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-    scene.environment = envTex;
-    pmrem.dispose();
-  } catch (err) {
-    console.warn('PMREM RoomEnvironment fallback:', err);
+  // Code-generated PMREM environment using RoomEnvironment (WebGL only)
+  if (!isSoftwareRenderer && renderer instanceof THREE.WebGLRenderer) {
+    try {
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+      scene.environment = envTex;
+      pmrem.dispose();
+    } catch (err) {
+      console.warn('PMREM RoomEnvironment fallback:', err);
+    }
   }
 
   // Lighting rig calibrated for both clay blockout (no white clipping) & shaded PBR
@@ -410,6 +471,7 @@ export function setupAugScene(container: HTMLElement): AugSceneContext {
   return {
     scene,
     renderer,
+    isSoftwareRenderer,
     orthoCamera,
     perspCamera,
     getActiveCamera: () => activeCamera,
