@@ -7,6 +7,9 @@ import * as THREE from "three";
 import { audioEngine, VIOLIN_STRINGS } from "@/lib/audioEngine";
 import { ParticleBurst } from "./StringParticles";
 
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "";
+const VIOLIN_MODEL_URL = `${BASE_PATH}/models/violin.glb`;
+
 interface ViolinModelProps {
   onHoverString?: (stringId: string | null, color: string | null) => void;
   onParticleBurst?: (burst: ParticleBurst) => void;
@@ -31,7 +34,7 @@ export const ViolinModel: React.FC<ViolinModelProps> = ({
   externalPulse = null,
 }) => {
   const groupRef = useRef<THREE.Group>(null);
-  const gltf = useGLTF("/models/violin.glb");
+  const gltf = useGLTF(VIOLIN_MODEL_URL);
 
   const vibrations = useRef<Record<string, StringVibrationState>>({
     String_G: { amplitude: 0, frequency: 196, startTime: 0, color: new THREE.Color("#FF0055"), initialX: 0 },
@@ -242,4 +245,4 @@ export const ViolinModel: React.FC<ViolinModelProps> = ({
   );
 };
 
-useGLTF.preload("/models/violin.glb");
+useGLTF.preload(VIOLIN_MODEL_URL);

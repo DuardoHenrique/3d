@@ -66,6 +66,7 @@ Opções:
     description: String(args.description || `${args.name} — Visualizador 3D`),
     accent: String(args.accent || '#38BDF8'),
     url: `http://localhost:${port}${route}`,
+    prodUrl: `/projects/${args.id}${route || '/'}`,
     enabled: true,
     dev: {
       cwd: String(args.cwd),

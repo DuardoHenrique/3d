@@ -8,9 +8,15 @@ Galeria unificada para visualizar e interagir com múltiplos modelos 3D em uma �
 - **Steyr AUG A1** (`projects/aug-a1`) — Rifle bullpup PBR com inspeção de peças e ações mecânicas (Three.js + Vite)
 - **Violino 3D** (`projects/violino-3d`) — Violino interativo isolado com OrbitControls, síntese sonora das cordas (Tone.js) e partículas (React Three Fiber + Next.js)
 
+## Deploy no Netlify
+
+O repositório já possui [`netlify.toml`](./netlify.toml) configurado:
+- **Build command:** `npm run build`
+- **Publish directory:** `dist`
+
 ## Como executar localmente
 
-1. Instale as dependências de todos os módulos:
+1. Instale as dependências:
 
 ```bash
 npm run setup
@@ -25,13 +31,3 @@ npm run dev
 3. Acesse no navegador:
 
 - `http://localhost:4000`
-
-## Como adicionar novos projetos 3D
-
-Você pode adicionar qualquer novo projeto 3D usando o comando:
-
-```bash
-npm run add-project -- --id meu-modelo --name "Meu Modelo" --cwd ../projects/meu-modelo
-```
-
-Ou editando diretamente `hub/projects.json`.

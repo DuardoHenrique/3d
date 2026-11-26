@@ -8,6 +8,7 @@
       "description": "Espada Divina procedural em cristal e ouro PBR",
       "accent": "#FBD472",
       "url": "http://localhost:5173",
+      "prodUrl": "/projects/sword-divine/",
       "enabled": true,
       "dev": {
         "cwd": "../projects/sword-divine",
@@ -22,6 +23,7 @@
       "description": "Rifle bullpup PBR com inspeção de peças e ações mecânicas",
       "accent": "#94A86B",
       "url": "http://localhost:5175",
+      "prodUrl": "/projects/aug-a1/",
       "enabled": true,
       "dev": {
         "cwd": "../projects/aug-a1",
@@ -36,6 +38,7 @@
       "description": "Violino interativo isolado com cordas sonoras e partículas",
       "accent": "#00F5D4",
       "url": "http://localhost:3000/embed",
+      "prodUrl": "/projects/violino-3d/embed/",
       "enabled": true,
       "dev": {
         "cwd": "../projects/violino-3d",

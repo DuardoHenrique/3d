@@ -2,9 +2,13 @@
   "name": "3d-studio-hub",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "setup": "npm --prefix hub install && npm --prefix projects/sword-divine install && npm --prefix projects/aug-a1 install && npm --prefix projects/violino-3d install",
     "dev": "npm --prefix hub run dev",
+    "build": "node scripts/build-static.mjs",
     "add-project": "npm --prefix hub run add-project --"
   }
 }

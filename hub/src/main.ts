@@ -7,6 +7,7 @@ interface ProjectEntry {
   description?: string;
   accent?: string;
   url: string;
+  prodUrl?: string;
   enabled?: boolean;
 }
 
@@ -23,7 +24,8 @@ const activeDesc = document.getElementById('active-description') as HTMLParagrap
 const reloadBtn = document.getElementById('reload-btn') as HTMLButtonElement;
 const externalLink = document.getElementById('open-external-link') as HTMLAnchorElement;
 
-function resolveProjectUrl(rawUrl: string): string {
+function resolveProjectUrl(project: ProjectEntry): string {
+  const rawUrl = import.meta.env.PROD && project.prodUrl ? project.prodUrl : project.url;
   try {
     const parsed = new URL(rawUrl, window.location.origin);
     if (
@@ -76,7 +78,7 @@ function selectProject(projectId: string, updateUrl = true) {
   if (!project) return;
 
   activeId = project.id;
-  const resolvedUrl = resolveProjectUrl(project.url);
+  const resolvedUrl = resolveProjectUrl(project);
 
   for (const [id, btn] of tabButtons.entries()) {
     const isSelected = id === project.id;
@@ -165,7 +167,7 @@ reloadBtn.addEventListener('click', () => {
   if (!current) return;
   loadingLabel.textContent = `Recarregando ${current.name}...`;
   loadingEl.hidden = false;
-  iframe.src = resolveProjectUrl(current.url);
+  iframe.src = resolveProjectUrl(current);
 });
 
 async function bootstrap() {
