@@ -45,6 +45,21 @@
         "command": "npm run dev -- -p 3000",
         "port": 3000
       }
+    },
+    {
+      "id": "honda-ehev-explorer",
+      "name": "Honda e:HEV",
+      "badge": "Three.js",
+      "description": "Cofre do motor híbrido Honda e:HEV com inspeção 360° e vista explodida",
+      "accent": "#FF6B00",
+      "url": "http://localhost:5176",
+      "prodUrl": "/projects/honda-ehev-explorer/",
+      "enabled": true,
+      "dev": {
+        "cwd": "../projects/honda-ehev-explorer",
+        "command": "npm run dev -- --port 5176 --strictPort",
+        "port": 5176
+      }
     }
   ]
 }

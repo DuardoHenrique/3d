@@ -35,6 +35,7 @@ function main() {
   const swordDir = path.join(ROOT_DIR, 'projects', 'sword-divine');
   const augDir = path.join(ROOT_DIR, 'projects', 'aug-a1');
   const violinDir = path.join(ROOT_DIR, 'projects', 'violino-3d');
+  const hondaDir = path.join(ROOT_DIR, 'projects', 'honda-ehev-explorer');
 
   // 1. Hub
   ensureInstalled(hubDir);
@@ -58,6 +59,11 @@ function main() {
     NEXT_PUBLIC_BASE_PATH: '/projects/violino-3d',
   });
   copyDir(path.join(violinDir, 'out'), path.join(DIST_DIR, 'projects', 'violino-3d'));
+
+  // 5. Honda e:HEV Explorer
+  ensureInstalled(hondaDir);
+  run('npm run build', hondaDir);
+  copyDir(path.join(hondaDir, 'dist'), path.join(DIST_DIR, 'projects', 'honda-ehev-explorer'));
 
   console.log('\nBuild estático unificado concluído em ./dist');
 }

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Honda e:HEV — Explorador 3D Interativo</title>
+  </head>
+  <body>
+    <div id="app">
+      <div id="viewport-container" aria-label="Visualizador 3D do cofre de motor Honda e:HEV"></div>
+
+      <!-- Projected 3D->2D floating labels -->
+      <div id="labels-layer" class="labels-layer" aria-hidden="true"></div>
+
+      <!-- Minimal top-left title -->
+      <header class="hud-header">
+        <div class="brand-badge">e:HEV</div>
+        <div class="brand-copy">
+          <h1>Cofre do Motor Honda e:HEV</h1>
+          <p>Arraste para girar · Role para zoom · Clique em uma peça para inspecionar em 360°</p>
+        </div>
+      </header>
+
+      <!-- Individual Inspection Panel (Left on desktop, compact bottom card on mobile) -->
+      <aside id="inspection-card" class="inspection-card" hidden aria-live="polite">
+        <div class="inspection-top">
+          <span id="insp-category" class="category-chip">Categoria</span>
+          <div class="nav-arrows">
+            <button id="btn-prev-part" type="button" class="icon-btn" title="Peça anterior (←)" aria-label="Peça anterior">
+              ←
+            </button>
+            <button id="btn-next-part" type="button" class="icon-btn" title="Próxima peça (→)" aria-label="Próxima peça">
+              →
+            </button>
+          </div>
+        </div>
+
+        <div class="inspection-title-row">
+          <span id="insp-dot" class="color-dot" aria-hidden="true"></span>
+          <h2 id="insp-name">Nome da Peça</h2>
+        </div>
+
+        <p id="insp-desc" class="inspection-desc"></p>
+
+        <div class="inspection-actions">
+          <button id="btn-toggle-texture" type="button" class="btn-secondary">
+            Ver textura padrão
+          </button>
+          <button id="btn-card-hide-base" type="button" class="btn-secondary" hidden>
+            Ocultar base (ver flutuando)
+          </button>
+          <button id="btn-assemble" type="button" class="btn-primary">
+            Montar novamente <kbd>ESC</kbd>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Synchronized Parts Legend / Drawer -->
+      <aside id="parts-drawer" class="parts-drawer" aria-label="Lista de peças do motor">
+        <button id="drawer-toggle" type="button" class="drawer-handle" aria-expanded="false">
+          <span class="drawer-handle-pill"></span>
+          <span class="drawer-title">Peças do Cofre (<span id="parts-count">10</span>)</span>
+          <span class="drawer-chevron" aria-hidden="true">▾</span>
+        </button>
+        <div id="parts-list" class="parts-list" role="list"></div>
+      </aside>
+
+      <!-- Bottom Quick Controls Bar -->
+      <nav class="controls-bar" aria-label="Controles rápidos da cena 3D">
+        <div class="explode-control">
+          <button id="btn-explode-toggle" type="button" class="ctrl-btn" aria-pressed="false">
+            Explodir
+          </button>
+          <label class="sr-only" for="explode-slider">Vista explodida</label>
+          <input
+            id="explode-slider"
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            value="0"
+            aria-label="Intensidade da vista explodida"
+          />
+          <span id="explode-value" class="explode-percent">0%</span>
+        </div>
+
+        <div class="ctrl-divider" aria-hidden="true"></div>
+
+        <button id="btn-labels-toggle" type="button" class="ctrl-btn" aria-pressed="false">
+          Rótulos
+        </button>
+
+        <button id="btn-base-toggle" type="button" class="ctrl-btn is-active" aria-pressed="true">
+          Base visível
+        </button>
+
+        <button id="btn-reset-camera" type="button" class="ctrl-btn">
+          Resetar câmera
+        </button>
+      </nav>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
